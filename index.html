@@ -1372,6 +1372,13 @@ window.loadUserData = async function() {
             const { data: exp } = await supabaseClient.from('expenses').select('*').eq('vendor_id', currentUser.id).order('date', {ascending: false});
             if (exp) dummyExpenses = exp.map(e => ({...e, amount: parseInt(e.amount)}));
 
+            // [BARU] SINKRONISASI NOTIFIKASI DARI SUPER ADMIN
+            const { data: notifData } = await supabaseClient.from('notifications').select('*').or(`user_id.eq.all,user_id.eq.${currentUser.id}`).order('date', {ascending: false});
+            if (notifData) {
+                dbNotifs = notifData.map(n => ({...n, userId: n.user_id}));
+                localStorage.setItem('jadwalin_db_notifs', JSON.stringify(dbNotifs));
+            }
+
         } catch(e) {
             console.warn("Supabase load error, fallback ke local", e);
             window.loadLocalUserData();
@@ -2958,6 +2965,15 @@ window.renderSuperAdmin = async function() {
                 }));
                 localStorage.setItem('jadwalin_db_vendors', JSON.stringify(dbVendors));
             }
+            
+            // [BARU] SINKRONISASI PENGADUAN DARI VENDOR
+            const { data: compData } = await supabaseClient.from('complaints').select('*').order('created_at', { ascending: false });
+            if (compData) {
+                dbComplaints = compData.map(c => ({
+                    ...c, vendorId: c.vendor_id, vendorName: c.vendor_name, vendorEmail: c.vendor_email, date: c.created_at
+                }));
+                localStorage.setItem('jadwalin_db_complaints', JSON.stringify(dbComplaints));
+            }
         } catch (e) {
             console.warn("Gagal mengambil data dari Supabase:", e);
         }
@@ -2973,6 +2989,18 @@ window.renderSuperAdmin = async function() {
     if(document.getElementById('adminActiveVendor')) document.getElementById('adminActiveVendor').innerText = active;
     if(document.getElementById('adminExpiredVendor')) document.getElementById('adminExpiredVendor').innerText = expired;
     if(document.getElementById('adminBannedVendor')) document.getElementById('adminBannedVendor').innerText = banned;
+
+    // [BARU] UPDATE NOTIFIKASI BADGE PENGADUAN
+    const pendingComplaints = dbComplaints.filter(c => c.status === 'Pending').length;
+    const compBadge = document.getElementById('adminComplaintBadge');
+    if (compBadge) {
+        if (pendingComplaints > 0) {
+            compBadge.innerText = pendingComplaints;
+            compBadge.classList.remove('hidden');
+        } else {
+            compBadge.classList.add('hidden');
+        }
+    }
 
     // Cek Bukti Pembayaran Pending
     const pendingVendor = dbVendors.filter(v => v.pending_status === 'pending');
@@ -3184,7 +3212,11 @@ window.sendAdminMessage = async function() {
     dbNotifs.unshift(notif);
     localStorage.setItem('jadwalin_db_notifs', JSON.stringify(dbNotifs));
     
-    if(supabaseClient) await supabaseClient.from('notifications').insert([notif]);
+    if(supabaseClient) {
+        await supabaseClient.from('notifications').insert([{
+            id: notif.id, user_id: notif.userId, title: notif.title, content: notif.content, type: notif.type, date: notif.date
+        }]);
+    }
 
     window.showToast('Pesan berhasil dikirim ke Pengguna!', 'success');
     window.closeModal('modalAdminMessage');
