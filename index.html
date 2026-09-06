@@ -2937,9 +2937,32 @@ window.submitSubPayment = async function() {
     }
 };
 
-window.renderSuperAdmin = function() {
+window.renderSuperAdmin = async function() {
     const c = document.getElementById('adminUserList'); if(!c) return;
     
+    // Tampilkan animasi loading saat menarik data dari Supabase
+    c.innerHTML = '<p class="text-center text-xs text-gray-500 py-4"><i class="fas fa-spinner fa-spin mr-2"></i> Mengambil data terbaru dari server...</p>';
+
+    // 1. SINKRONISASI SUPER ADMIN: Tarik data terbaru dari Supabase agar bukti pembayaran dan status paket sinkron
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient.from('vendors').select('*').order('created_at', { ascending: false });
+            if (data && !error) {
+                // Perbarui memori lokal Super Admin dengan data asli dari cloud
+                dbVendors = data.map(v => ({
+                    ...v,
+                    fullName: v.full_name,
+                    planExpiry: v.plan_expiry,
+                    logoBase64: v.logo_base64,
+                    coverBase64: v.cover_base64
+                }));
+                localStorage.setItem('jadwalin_db_vendors', JSON.stringify(dbVendors));
+            }
+        } catch (e) {
+            console.warn("Gagal mengambil data dari Supabase:", e);
+        }
+    }
+
     // Kalkulasi Statistik Vendor
     const total = dbVendors.length;
     const active = dbVendors.filter(v => v.status !== 'banned' && new Date(v.planExpiry || 0) > new Date()).length;
