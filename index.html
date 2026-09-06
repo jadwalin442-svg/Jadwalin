@@ -1320,6 +1320,36 @@ window.loadUserData = async function() {
 
     if (supabaseClient) {
         try {
+            // [BARU] SINKRONISASI PROFIL: Ambil profil terbaru dari Supabase agar sinkron antar perangkat (HP & Laptop)
+            const { data: vData } = await supabaseClient.from('vendors').select('*').eq('id', currentUser.id).limit(1);
+            if (vData && vData.length > 0) {
+                const v = vData[0];
+                currentUser.name = v.name || currentUser.name;
+                currentUser.fullName = v.full_name || currentUser.fullName;
+                currentUser.phone = v.phone || currentUser.phone;
+                currentUser.address = v.address || currentUser.address;
+                currentUser.logoBase64 = v.logo_base64 || currentUser.logoBase64;
+                currentUser.coverBase64 = v.cover_base64 || currentUser.coverBase64;
+                currentUser.plan = v.plan || currentUser.plan;
+                currentUser.planExpiry = v.plan_expiry || currentUser.planExpiry;
+                currentUser.slug = v.slug || currentUser.slug;
+                currentUser.tagline = v.tagline || currentUser.tagline;
+                currentUser.bio = v.bio || currentUser.bio;
+                currentUser.bookingNote = v.booking_note || currentUser.bookingNote;
+                currentUser.hours = v.working_hours || currentUser.hours;
+                currentUser.gmaps = v.gmaps_link || currentUser.gmaps;
+                currentUser.wa = v.wa_number || currentUser.wa;
+                currentUser.ig = v.ig_handle || currentUser.ig;
+                currentUser.tiktok = v.tiktok_handle || currentUser.tiktok;
+                currentUser.portfolio = v.portfolio || currentUser.portfolio;
+                currentUser.bankAccounts = v.bank_accounts || currentUser.bankAccounts;
+                currentUser.invoiceTerms = v.invoice_terms || currentUser.invoiceTerms;
+                currentUser.invoiceColor = v.invoice_color || currentUser.invoiceColor;
+                
+                // Perbarui data di memori internal perangkat
+                localStorage.setItem('jadwalin_user', JSON.stringify(currentUser));
+            }
+
             // Load dari Supabase
             const { data: svc } = await supabaseClient.from('services').select('*').eq('vendor_id', currentUser.id);
             if (svc) dummyServices = svc.map(s => ({...s, price: parseInt(s.price), duration: parseInt(s.duration)}));
