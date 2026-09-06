@@ -1414,7 +1414,11 @@ window.handleRegister = async function() {
     if(!name || !email || !pass || !business) return window.showToast('Lengkapi semua data!', 'error');
     
     if (supabaseClient) {
-        const { data } = await supabaseClient.from('vendors').select('email').eq('email', email).limit(1);
+        const { data, error: checkErr } = await supabaseClient.from('vendors').select('email').eq('email', email).limit(1);
+        if (checkErr) {
+            console.error("Supabase Check Error:", checkErr);
+            return window.showToast('Eror Database: ' + checkErr.message, 'error');
+        }
         if (data && data.length > 0) return window.showToast('Email sudah terdaftar!', 'error');
     } else if (dbVendors.find(u => u.email === email)) {
         return window.showToast('Email sudah terdaftar!', 'error');
@@ -1435,7 +1439,27 @@ window.handleRegister = async function() {
     };
 
     if (supabaseClient) {
-        try { await supabaseClient.from('vendors').insert([{...newUser, fullName: undefined, planExpiry: undefined}]); } 
+        try { 
+            // Memastikan hanya kolom yang ada di database yang dikirim
+            const insertPayload = {
+                id: newUser.id,
+                email: newUser.email,
+                pass: newUser.pass,
+                name: newUser.name,
+                full_name: newUser.full_name,
+                role: newUser.role,
+                plan: newUser.plan,
+                plan_expiry: newUser.plan_expiry,
+                status: newUser.status
+            };
+            
+            const { error } = await supabaseClient.from('vendors').insert([insertPayload]); 
+            if (error) {
+                console.error("Supabase Insert Error:", error);
+                // INI AKAN MEMUNCULKAN ALASAN EROR DARI SUPABASE DI LAYAR!
+                return window.showToast('Gagal simpan ke cloud: ' + error.message, 'error');
+            }
+        } 
         catch(e) { console.warn('Supabase register error', e); }
     }
 
