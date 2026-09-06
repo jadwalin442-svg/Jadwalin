@@ -2789,6 +2789,45 @@ window.saveWebBuilderSettings = async function() {
     window.showToast('Tampilan website disimpan!', 'success');
 };
 
+window.copyWebLink = function() {
+    const slug = document.getElementById('webSlug').value.trim();
+    if(!slug) return window.showToast('Username/Link unik tidak boleh kosong!', 'error');
+    
+    // Mendapatkan URL domain saat ini
+    let basePath = window.location.href.split('?')[0].replace('index.html', '');
+    if(!basePath.endsWith('/')) basePath += '/';
+    const finalUrl = basePath + 'public_booking.html?slug=' + slug;
+    
+    // Salin ke clipboard menggunakan textarea (kompatibel untuk berbagai browser/HP)
+    const textArea = document.createElement("textarea");
+    textArea.value = finalUrl;
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        window.showToast('Link berhasil disalin!', 'success');
+    } catch (err) {
+        window.showToast('Gagal menyalin link.', 'error');
+    }
+    document.body.removeChild(textArea);
+};
+
+window.openWebPreview = function() {
+    const slug = document.getElementById('webSlug').value.trim();
+    if(!slug) return window.showToast('Username/Link unik tidak boleh kosong!', 'error');
+    
+    // Mendapatkan URL domain saat ini
+    let basePath = window.location.href.split('?')[0].replace('index.html', '');
+    if(!basePath.endsWith('/')) basePath += '/';
+    const finalUrl = basePath + 'public_booking.html?slug=' + slug;
+    
+    // Buka di tab baru
+    window.open(finalUrl, '_blank');
+};
+
 // Pengaduan
 window.openComplaintModal = function() { document.getElementById('compTitle').value = ''; document.getElementById('compDesc').value = ''; window.openModal('modalComplaint'); };
 window.submitComplaint = async function() {
