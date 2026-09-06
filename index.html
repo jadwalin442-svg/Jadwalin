@@ -730,7 +730,7 @@
         </div>
         
         <!-- Paywall (Terkunci - Hanya untuk Basic/Trial) -->
-        <div id="webBuilderLocked" class="scrollable-content p-5 hidden">
+        <div id="webBuilderLocked" class="scrollable-content px-5 pt-5 pb-28 hidden">
             <div class="bg-gradient-to-br from-purple-100 to-pink-50 rounded-2xl p-6 text-center border border-purple-200 shadow-sm">
                 <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-3xl text-pink-500 mb-4 shadow-sm"><i class="fas fa-globe"></i></div>
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Website Booking Pribadi</h3>
@@ -742,7 +742,7 @@
         </div>
 
         <!-- Halaman Builder Terbuka (Khusus Paket Pro) -->
-        <div id="webBuilderUnlocked" class="scrollable-content p-5 hidden">
+        <div id="webBuilderUnlocked" class="scrollable-content px-5 pt-5 pb-28 hidden">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 relative overflow-hidden">
                 <div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl shadow-sm">Status: Aktif</div>
                 <h4 class="text-xs font-bold text-gray-800 border-b pb-2 mb-3">Link Website Booking Anda</h4>
@@ -940,7 +940,7 @@
         <div class="bg-white p-4 shadow-sm flex items-center gap-3 sticky top-0 z-30">
             <i class="fas fa-arrow-left text-gray-600 cursor-pointer p-2 hover:bg-gray-100 rounded-full transition" onclick="window.showScreen('settingsScreen')"></i><h2 class="text-lg font-bold text-gray-800">Profil Bisnis</h2>
         </div>
-        <div class="scrollable-content p-5 space-y-4">
+        <div class="scrollable-content px-5 pt-5 pb-28 space-y-4">
             <div class="flex flex-col items-center mb-2">
                 <div class="relative">
                     <img id="logoPreview" src="https://placehold.co/100x100/e2e8f0/94a3b8?text=Logo" class="w-20 h-20 rounded-full object-cover border-2 border-purple-200 shadow-sm">
@@ -960,7 +960,7 @@
     <!-- Rekening & Invoice -->
     <div id="bankSettingsScreen" class="hidden-screen h-full w-full bg-gray-50 flex flex-col z-20 absolute top-0 left-0">
         <div class="bg-white p-4 shadow-sm flex items-center gap-3 sticky top-0 z-30"><i class="fas fa-arrow-left text-gray-600 cursor-pointer p-2 hover:bg-gray-100 rounded-full transition" onclick="window.showScreen('settingsScreen')"></i><h2 class="text-lg font-bold text-gray-800">Rekening & Invoice</h2></div>
-        <div class="scrollable-content p-5 space-y-4">
+        <div class="scrollable-content px-5 pt-5 pb-28 space-y-4">
             <div class="flex justify-between items-center mb-1">
                 <h4 class="text-xs font-bold text-gray-700 flex-1">Daftar Rekening</h4>
                 <button onclick="window.addBankForm()" class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[10px] font-bold shadow-sm hover:bg-purple-200 transition"><i class="fas fa-plus"></i> Tambah</button>
@@ -978,7 +978,7 @@
         <div class="bg-white p-4 shadow-sm flex items-center gap-3 sticky top-0 z-30">
             <i class="fas fa-arrow-left text-gray-600 cursor-pointer p-2 hover:bg-gray-100 rounded-full transition" onclick="window.showScreen('settingsScreen')"></i><h2 class="text-lg font-bold text-gray-800">Atur Langganan</h2>
         </div>
-        <div class="scrollable-content p-5 space-y-5">
+        <div class="scrollable-content px-5 pt-5 pb-28 space-y-5">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-pink-500"></div>
                 <p class="text-xs font-semibold text-gray-500 mb-2">Status Langganan</p>
@@ -1456,8 +1456,8 @@ window.handleRegister = async function() {
             const { error } = await supabaseClient.from('vendors').insert([insertPayload]); 
             if (error) {
                 console.error("Supabase Insert Error:", error);
-                // INI AKAN MEMUNCULKAN ALASAN EROR DARI SUPABASE DI LAYAR!
-                return window.showToast('Gagal simpan ke cloud: ' + error.message, 'error');
+                // Kembalikan ke error yang ramah pengguna
+                return window.showToast('Gagal mendaftar, silakan coba lagi nanti.', 'error');
             }
         } 
         catch(e) { console.warn('Supabase register error', e); }
