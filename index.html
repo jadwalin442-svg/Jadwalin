@@ -2780,7 +2780,19 @@ window.saveWebBuilderSettings = async function() {
     });
     currentUser.coverBase64 = tempCoverBase64; currentUser.portfolio = tempPortfolio;
     
-    if(supabaseClient) await supabaseClient.from('vendors').update({slug: currentUser.slug, tagline: currentUser.tagline, bio: currentUser.bio, booking_note: currentUser.bookingNote, working_hours: currentUser.hours, gmaps_link: currentUser.gmaps, wa_number: currentUser.wa, ig_handle: currentUser.ig, tiktok_handle: currentUser.tiktok}).eq('id', currentUser.id);
+    if(supabaseClient) await supabaseClient.from('vendors').update({
+        slug: currentUser.slug, 
+        tagline: currentUser.tagline, 
+        bio: currentUser.bio, 
+        booking_note: currentUser.bookingNote, 
+        working_hours: currentUser.hours, 
+        gmaps_link: currentUser.gmaps, 
+        wa_number: currentUser.wa, 
+        ig_handle: currentUser.ig, 
+        tiktok_handle: currentUser.tiktok,
+        cover_base64: currentUser.coverBase64,
+        portfolio: currentUser.portfolio
+    }).eq('id', currentUser.id);
 
     localStorage.setItem('jadwalin_user', JSON.stringify(currentUser));
     let allV = JSON.parse(localStorage.getItem('jadwalin_db_vendors')) || [];
